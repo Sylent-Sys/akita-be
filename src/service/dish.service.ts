@@ -23,7 +23,7 @@ export default class DishService {
                 selectedDishes[type] = dishes[randomIndex];
             }
         }
-        await setRedisAsync(cacheKey, JSON.stringify(selectedDishes), 60);
+        await setRedisAsync(cacheKey, JSON.stringify(selectedDishes), 86400);
         return selectedDishes
     }
 }
