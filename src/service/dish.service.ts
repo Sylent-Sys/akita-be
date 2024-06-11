@@ -6,6 +6,13 @@ export default class DishService {
     static async getDishes() {
         return await prisma.dish.findMany();
     }
+    static async getDish(id: string) {
+        return await prisma.dish.findUnique({
+            where: {
+                id
+            }
+        });
+    }
     static async getDishDaily() {
         const today = new Date().toISOString().split('T')[0];
         const cacheKey = `daily-dishes-${today}`;
