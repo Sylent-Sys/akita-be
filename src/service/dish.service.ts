@@ -4,14 +4,30 @@ import { getRedisAsync, setRedisAsync } from "../redis.js";
 
 export default class DishService {
     static async getDishes() {
-        return await prisma.dish.findMany();
+        const today = new Date().toISOString().split('T')[0];
+        const cacheKey = `dishes-${today}`;
+        const dishes = await getRedisAsync(cacheKey);
+        if (dishes) {
+            return JSON.parse(dishes);
+        }
+        const allDish = await prisma.dish.findMany();
+        await setRedisAsync(cacheKey, JSON.stringify(allDish), 86400);
+        return dishes;
     }
     static async getDish(id: string) {
-        return await prisma.dish.findUnique({
+        const today = new Date().toISOString().split('T')[0];
+        const cacheKey = `dish-${id}-${today}`;
+        const dish = await getRedisAsync(cacheKey);
+        if (dish) {
+            return JSON.parse(dish);
+        }
+        const dishData = await prisma.dish.findUnique({
             where: {
                 id
             }
         });
+        await setRedisAsync(cacheKey, JSON.stringify(dishData), 86400);
+        return dishData;
     }
     static async getDishDaily() {
         const today = new Date().toISOString().split('T')[0];
